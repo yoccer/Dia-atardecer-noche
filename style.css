@@ -1,0 +1,321 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+}
+
+/* ===== VARIABLES DE VELOCIDAD =====
+   --velocidad       → transición normal (noche ↔ amanecer)
+   --velocidad-atardecer → duración del atardecer
+   Si las cambias, actualiza también los valores en script.js */
+:root {
+  --velocidad: 4s;
+  --velocidad-atardecer: 4s;
+}
+
+/* ===== ESCENA ===== */
+.escena {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180deg, #050510 0%, #0b0b2b 50%, #131a3a 100%);
+  overflow: hidden;
+  transition: background var(--velocidad) ease-in-out;
+}
+
+/* ☀️ DÍA */
+.escena.dia {
+  background: linear-gradient(180deg, #4aa8ff 0%, #7fc9ff 50%, #bfe8ff 100%);
+}
+
+/* 🌇 ATARDECER (etapa intermedia entre día y noche) */
+.escena.atardecer {
+  background: linear-gradient(180deg, #2b1a4a 0%, #a83250 35%, #ff6b3d 70%, #ffb347 100%);
+}
+
+/* ===== ESTRELLAS ===== */
+.estrellas {
+  position: absolute;
+  inset: 0;
+  transition: opacity var(--velocidad) ease-in-out;
+}
+
+.estrella {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: titilar 2s infinite ease-in-out;
+}
+
+@keyframes titilar {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+.escena.dia .estrellas,
+.escena.atardecer .estrellas {
+  opacity: 0;
+}
+
+/* ===== LUNA ===== */
+.luna {
+  position: absolute;
+  top: 12%;
+  right: 15%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #d9d9e8 70%, #b9b9cf);
+  border-radius: 50%;
+  box-shadow: 0 0 60px 20px rgba(255, 255, 255, 0.35);
+  transition: opacity var(--velocidad) ease-in-out,
+              transform var(--velocidad) ease-in-out;
+  z-index: 2;
+}
+
+.crater { position: absolute; background: rgba(160, 160, 190, 0.5); border-radius: 50%; }
+.c1 { width: 22px; height: 22px; top: 25px; left: 30px; }
+.c2 { width: 14px; height: 14px; top: 60px; left: 55px; }
+.c3 { width: 10px; height: 10px; top: 45px; left: 20px; }
+
+.escena.dia .luna,
+.escena.atardecer .luna {
+  opacity: 0;
+  transform: translateY(300px);
+}
+
+/* ===== SOL ===== */
+.sol {
+  position: absolute;
+  top: 12%;
+  right: 15%;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle at 40% 40%, #fff7b0, #ffd23f 60%, #ffa500);
+  border-radius: 50%;
+  box-shadow: 0 0 80px 30px rgba(255, 200, 60, 0.6);
+  opacity: 0;
+  transform: translateY(400px) scale(0.6);
+  transition: opacity var(--velocidad) ease-in-out,
+              transform var(--velocidad) cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+}
+
+/* Sol de día */
+.escena.dia .sol {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: brillo 3s infinite ease-in-out;
+}
+
+/* Sol en atardecer: más bajo y rojizo (se está poniendo) */
+.escena.atardecer .sol {
+  opacity: 1;
+  transform: translateY(220px) scale(1.05);
+  background: radial-gradient(circle at 40% 40%, #fff1a0, #ff8c42 55%, #d62828);
+  box-shadow: 0 0 100px 45px rgba(255, 120, 50, 0.7);
+  transition: opacity var(--velocidad-atardecer) ease-in-out,
+              transform var(--velocidad-atardecer) ease-in-out,
+              background var(--velocidad-atardecer) ease-in-out,
+              box-shadow var(--velocidad-atardecer) ease-in-out;
+}
+
+@keyframes brillo {
+  0%, 100% { box-shadow: 0 0 80px 30px rgba(255, 200, 60, 0.6); }
+  50% { box-shadow: 0 0 110px 45px rgba(255, 210, 80, 0.8); }
+}
+
+/* ===== NUBES ===== */
+.nube {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50px;
+  filter: blur(1px);
+  opacity: 0;
+  transition: opacity var(--velocidad) ease-in-out,
+              background var(--velocidad) ease-in-out;
+  z-index: 1;
+}
+
+.nube::before,
+.nube::after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.nube1 { width: 140px; height: 45px; top: 25%; left: 10%; }
+.nube1::before { width: 70px; height: 70px; top: -30px; left: 20px; }
+.nube1::after  { width: 55px; height: 55px; top: -22px; left: 70px; }
+
+.nube2 { width: 180px; height: 55px; top: 40%; left: 55%; }
+.nube2::before { width: 85px; height: 85px; top: -38px; left: 30px; }
+.nube2::after  { width: 65px; height: 65px; top: -28px; left: 95px; }
+
+.nube3 { width: 120px; height: 40px; top: 15%; left: 75%; }
+.nube3::before { width: 60px; height: 60px; top: -26px; left: 18px; }
+.nube3::after  { width: 48px; height: 48px; top: -18px; left: 60px; }
+
+/* Nubes de día */
+.escena.dia .nube1 { opacity: 1; animation: flotar 14s ease-in-out infinite; }
+.escena.dia .nube2 { opacity: 1; animation: flotar 18s ease-in-out infinite; }
+.escena.dia .nube3 { opacity: 1; animation: flotar 22s ease-in-out infinite; }
+
+/* Nubes de atardecer: tono cálido */
+.escena.atardecer .nube { opacity: 0.7; background: rgba(255, 200, 160, 0.8); }
+.escena.atardecer .nube1 { animation: flotar 16s ease-in-out infinite; }
+.escena.atardecer .nube2 { animation: flotar 20s ease-in-out infinite; }
+.escena.atardecer .nube3 { animation: flotar 24s ease-in-out infinite; }
+
+@keyframes flotar {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(30px); }
+}
+
+/* ===== COLINAS ===== */
+.colina {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  transition: background var(--velocidad) ease-in-out;
+}
+
+.colina-atras {
+  height: 28%;
+  background: radial-gradient(ellipse at 30% 100%, #1a2340 0%, #111a30 100%);
+  clip-path: ellipse(70% 100% at 30% 100%);
+}
+
+.colina-frente {
+  height: 22%;
+  background: radial-gradient(ellipse at 70% 100%, #0e1528 0%, #080d18 100%);
+  clip-path: ellipse(75% 100% at 70% 100%);
+}
+
+.escena.dia .colina-atras   { background: radial-gradient(ellipse at 30% 100%, #4caf50 0%, #2e7d32 100%); }
+.escena.dia .colina-frente  { background: radial-gradient(ellipse at 70% 100%, #66bb6a 0%, #388e3c 100%); }
+
+.escena.atardecer .colina-atras  { background: radial-gradient(ellipse at 30% 100%, #3a2440 0%, #241428 100%); }
+.escena.atardecer .colina-frente { background: radial-gradient(ellipse at 70% 100%, #2a1a30 0%, #160c1a 100%); }
+
+/* ===== LÁMPARA ===== */
+.lampara {
+  position: absolute;
+  top: 20%;
+  left: 18%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+}
+
+.cable { width: 4px; height: 60px; background: #2b2b2b; }
+
+.pantalla {
+  position: relative;
+  width: 90px;
+  height: 60px;
+  background: linear-gradient(180deg, #3a3a3a, #1f1f1f);
+  border-radius: 50% 50% 8px 8px / 90% 90% 10px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  box-shadow: inset 0 -5px 10px rgba(0,0,0,0.5);
+}
+
+.bombilla {
+  width: 26px;
+  height: 26px;
+  background: #fff3b0;
+  border-radius: 50%;
+  margin-bottom: -10px;
+  box-shadow: 0 0 25px 12px rgba(255, 230, 120, 0.7);
+  transition: opacity var(--velocidad) ease-in-out,
+              box-shadow var(--velocidad) ease-in-out;
+}
+
+.escena.dia .bombilla {
+  opacity: 0.15;
+  box-shadow: 0 0 6px 2px rgba(255, 230, 120, 0.2);
+}
+
+/* Cuerda */
+.cuerda-contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.cuerda-contenedor:active { cursor: grabbing; }
+
+.cuerda {
+  width: 3px;
+  height: 70px;
+  background: repeating-linear-gradient(
+    180deg, #d4a373 0px, #d4a373 4px, #b5835a 4px, #b5835a 8px
+  );
+  transition: height 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bolita {
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 35% 35%, #ffe08a, #d4a373);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  margin-top: -2px;
+}
+
+/* ===== TEXTO AYUDA ===== */
+.ayuda {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  transition: color var(--velocidad) ease-in-out;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.escena.dia .ayuda        { color: rgba(30, 60, 90, 0.8); }
+.escena.atardecer .ayuda  { color: rgba(255, 230, 200, 0.9); }
+
+/* ===== ESTRELLAS FUGACES ===== */
+.fugaz {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.9);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.fugaz::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.9) 100%);
+  transform: translateY(-50%);
+  border-radius: 2px;
+}
+
+@keyframes fugaz {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translate(420px, 260px); opacity: 0; }
+}
